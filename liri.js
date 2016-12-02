@@ -1,39 +1,111 @@
-var twitterKeys = require("./keys.js");
-var Twitter = require("twitter");
+var twitts = require("./keys.js");
+var twitter = require('twitter');
+var spotify = require('spotify');
+var request = require('request');
+var fs = require('fs');
 
-var TWconsumerKey = twitterKeys.consumer_key;
-
-console.log(TWconsumerKey);
-
-var TWconsumerSecret = twitterKeys.consumer_secret;
-var TWaccessToken = twitterKeys.access_token_key;
-var TWaccessSecret = twitterKeys.access_token_secret;
-
-var client = new Twitter({
-	consumer_key: TWconsumerKey,
-	consumer_secret: TWconsumerSecret,
-	access_token_key: TWaccessToken,
-	access_token_secret: TWaccessSecret,
-});
-
-var input = process.argv[2];
-var parameter = process.argv[3];
-
-
-if (input === "my-tweets") {
-	client.get('statuses/user_timeline', {count: 20, screen_name: 'carlylumel'}, function(error, tweets, response){
-		//if(error) throw error;
-		console.log(tweets);
-		console.log(response);
-	});
+var startLiri = function(input1, input2) {
+  functionOptions(input1, input2);
 };
 
-if (input === "spotify-this-song") {
+var functionOptions = function(option, parameter) {
+  switch (option) {
+    case 'my-tweets':
+      myTweets();
+      break;
+    case 'spotify-this-song':
+      spotifyThisSong(parameter);
+      break;
+    case 'movie-this':
+      movieThis(parameter);
+      break;
+    case 'do-what-it-says':
+      doWhatItSays();
+      break;
+    default:
+      console.log('Liri doesn\'t know that');
+  }
+};
 
+var myTweets = function() {
+  var client = new twitter(twitts.twitterKeys);
+  var tweetsArray= [];
+  client.get('statuses/user_timeline', {screen_name: 'spimch', count: 20}, function(error, tweets, response) {
+  	var tweetsArray= [];
+    for (var i = 0; i < tweets.length; i++) {
+        tweetsArray.push({
+            'Created At: ' : tweets[i].created_at,
+            'Tweets: ' : tweets[i].text,
+        });
+      };
+      console.log(tweetsArray);
+   });
+};
+
+var spotifyThisSong= function(title) {
+  if (title === undefined) {
+    title = "The Sign";
+  };
+
+var getArtistName = function(artistName) {
+	return artist.name;
+}
+  spotify.search({ type: "track", query: title }, function(err, data) {
+    if (err) throw err;
+
+    var songs = data.tracks.items;
+    var songArray = []; 
+	//console.log(JSON.stringify(data));
+    for (var i = 0; i < songs.length; i++) {
+      	songArray.push({
+        'Artist(s)': songs[i].artists.name,
+        'Title: ': songs[i].name,
+        'Preview Link: ': songs[i].preview_url,
+        'Album: ': songs[i].album.name,
+      });
+    };
+    console.log(songArray);
+  });
+};
+
+var movieThis = function(movie) {
+  if (movie === undefined) {
+    movie = 'Mr Nobody';
+  };
+
+  var omdbURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=full&tomatoes=true&r=json";
+  var movieArray = [];
+  request(omdbURL, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+ 
+      var movieData = JSON.parse(body);
+
+      movieArray.push({
+      'Title: ' : movieData.Title,
+      'Year: ' : movieData.Year,
+      'Rated: ' : movieData.Rated,
+      'IMDB Rating: ' : movieData.imdbRating,
+      'Country: ' : movieData.Country,
+      'Language: ' : movieData.Language,
+      'Plot: ' : movieData.Plot,
+      'Actors: ' : movieData.Actors,
+      'Rotten Tomatoes Rating: ' : movieData.tomatoRating,
+      'Rotten Tomatoes URL: ' : movieData.tomatoURL,
+      });
+    };
+    console.log(movieArray);
+});
+};
+
+var doWhatItSays = function() {
+  fs.readFile("./random.txt", "utf8", function(error, response) {
+    var logArray = response.split(',')
+    if (logArray.length == 2) {
+      functionOptions(logArray[0], logArray[1]);
+    } else if (logArray.length == 1) {
+      functionOptions(logArray[0]);
+    }
+  });
 }
 
-if (input === "movie-this") {
-
-}
-
-if (input === "do-what-it-says");
+startLiri(process.argv[2], process.argv[3]);
