@@ -47,9 +47,6 @@ var spotifyThisSong= function(title) {
     title = "The Sign";
   };
 
-var getArtistName = function(artistName) {
-	return artist.name;
-}
   spotify.search({ type: "track", query: title }, function(err, data) {
     if (err) throw err;
 
@@ -58,7 +55,7 @@ var getArtistName = function(artistName) {
 	//console.log(JSON.stringify(data));
     for (var i = 0; i < songs.length; i++) {
       	songArray.push({
-        'Artist(s)': songs[i].artists.name,
+        'Artist(s)': songs[i].album.artists[0].name,
         'Title: ': songs[i].name,
         'Preview Link: ': songs[i].preview_url,
         'Album: ': songs[i].album.name,
@@ -74,27 +71,29 @@ var movieThis = function(movie) {
   };
 
   var omdbURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=full&tomatoes=true&r=json";
-  var movieArray = [];
-  request(omdbURL, function(error, response, body) {
-    if (!error && response.statusCode == 200) {
- 
-      var movieData = JSON.parse(body);
 
-      movieArray.push({
-      'Title: ' : movieData.Title,
-      'Year: ' : movieData.Year,
-      'Rated: ' : movieData.Rated,
-      'IMDB Rating: ' : movieData.imdbRating,
-      'Country: ' : movieData.Country,
-      'Language: ' : movieData.Language,
-      'Plot: ' : movieData.Plot,
-      'Actors: ' : movieData.Actors,
-      'Rotten Tomatoes Rating: ' : movieData.tomatoRating,
-      'Rotten Tomatoes URL: ' : movieData.tomatoURL,
-      });
-    };
+  var movieArray = [];
+
+  request(omdbURL, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+ 
+        var movieData = JSON.parse(body);
+
+        movieArray.push({
+          'Title: ' : movieData.Title,
+          'Year: ' : movieData.Year,
+          'Rated: ' : movieData.Rated,
+          'IMDB Rating: ' : movieData.imdbRating,
+          'Country: ' : movieData.Country,
+          'Language: ' : movieData.Language,
+          'Plot: ' : movieData.Plot,
+          'Actors: ' : movieData.Actors,
+          'Rotten Tomatoes Rating: ' : movieData.tomatoRating,
+          'Rotten Tomatoes URL: ' : movieData.tomatoURL,
+        });
+      };
     console.log(movieArray);
-});
+  });
 };
 
 var doWhatItSays = function() {
