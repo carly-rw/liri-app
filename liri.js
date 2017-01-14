@@ -8,6 +8,18 @@ var startLiri = function(input1, input2) {
   functionOptions(input1, input2);
 };
 
+var logLiri = function(input, data) {
+  fs.appendFile("log.txt", (input + ": "), function(err) {
+    if (err) throw err;
+    console.log("The command was appended to the log");
+  });
+
+  fs.appendFile("log.txt", (data + "\n ----------------------- \n"), function(err) {
+    if (err) throw err;
+    console.log("The data was appended to the log");
+  });
+};
+
 var functionOptions = function(option, parameter) {
   switch (option) {
     case 'my-tweets':
@@ -39,6 +51,7 @@ var myTweets = function() {
         });
       };
       console.log(tweetsArray);
+      logLiri("my-tweets", JSON.stringify(tweetsArray));
    });
 };
 
@@ -62,6 +75,7 @@ var spotifyThisSong= function(title) {
       });
     };
     console.log(songArray);
+    logLiri("spotify-this-song", JSON.stringify(songArray));
   });
 };
 
@@ -93,6 +107,7 @@ var movieThis = function(movie) {
         });
       };
     console.log(movieArray);
+    logLiri("movie-this", JSON.stringify(movieArray));
   });
 };
 
